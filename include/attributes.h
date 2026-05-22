@@ -1,0 +1,1 @@
+// structs de atributos gerais
