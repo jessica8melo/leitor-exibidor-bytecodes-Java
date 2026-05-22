@@ -1,13 +1,15 @@
-// structs e funções de fields
 #ifndef FIELDS_H
 #define FIELDS_H
 
 #include <stdint.h>
-#include "constant_pool.h"
+#include <stdlib.h>
 
-/*
-    Structs de atributos de field
-*/
+typedef struct {
+    uint8_t  tag;
+    void    *data; 
+} ConstantPoolEntry;
+
+const char *cp_get_utf8(const ConstantPoolEntry *cp, uint16_t index);
 
 typedef struct {
     uint16_t constantvalue_index;
@@ -18,10 +20,10 @@ typedef struct {
 } Signature_attribute;
 
 typedef struct {
-    uint16_t num_annotations;
-    uint8_t *raw_bytes;
-    uint32_t raw_length;
-} Annotations_attributes;
+    uint16_t  num_annotations;
+    uint8_t  *raw_bytes;
+    uint32_t  raw_length;
+} Annotations_attribute;
 
 typedef enum {
     ATTR_CONSTANT_VALUE = 0,
@@ -34,43 +36,43 @@ typedef enum {
 } FieldAttributeTag;
 
 typedef struct {
-    uint16_t attribute_name_index;
-    uint32_t attribute_length;
+    uint16_t          attribute_name_index;
+    uint32_t          attribute_length;
     FieldAttributeTag tag;
     union {
         ConstantValue_attribute constant_value;
         Signature_attribute     signature;
-        Annotations_attributes  annotations;
+        Annotations_attribute   annotations;
         struct {
-            uint8_t *data;
-            uint32_t length;
+            uint8_t  *data;
+            uint32_t  length;
         } unknown;
     } info;
 } FieldAttributeInfo;
 
 typedef struct {
-    uint16_t access_flags;
-    uint16_t name_index;
-    uint16_t descriptor_index;
-    uint16_t attributes_count;
-    FieldAttributeInfo  *attributes;
+    uint16_t           access_flags;
+    uint16_t           name_index;
+    uint16_t           descriptor_index;
+    uint16_t           attributes_count;
+    FieldAttributeInfo *attributes;
 } FieldInfo;
 
-#define ACC_PUBLIC      0X0001
-#define ACC_PRIVATE     0X0002
-#define ACC_PROTECTED   0X0004
-#define ACC_STATIC      0X0008
-#define ACC_FINAL       0X0010
-#define ACC_VOLATILE    0X0040
-#define ACC_TRANSIENT   0X0080
-#define ACC_SYNTHETIC   0X1000
-#define ACC_ENUM        0X4000
+#define ACC_PUBLIC    0x0001
+#define ACC_PRIVATE   0x0002
+#define ACC_PROTECTED 0x0004
+#define ACC_STATIC    0x0008
+#define ACC_FINAL     0x0010
+#define ACC_VOLATILE  0x0040
+#define ACC_TRANSIENT 0x0080
+#define ACC_SYNTHETIC 0x1000
+#define ACC_ENUM      0x4000
 
-FieldInfo *parser_fields(const uint8_t *data, uint32_t data_len, 
-                         uint32_t *offset, uint16_t fields_count, 
-                         const ConstantPoolEntry *cp);
+FieldInfo *parse_fields(const uint8_t *data, uint32_t data_len,
+                        uint32_t *offset, uint16_t fields_count,
+                        const ConstantPoolEntry *cp);
 
-void print_fields(const FieldInfo *fields, uint16_t fields_count, 
+void print_fields(const FieldInfo *fields, uint16_t fields_count,
                   const ConstantPoolEntry *cp);
 
 void free_fields(FieldInfo *fields, uint16_t fields_count);
