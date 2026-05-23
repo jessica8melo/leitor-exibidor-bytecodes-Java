@@ -102,6 +102,35 @@ static void free_constant_pool_strings(void) {
     g_cp_count = 0;
 }
 
+static void class_flags_to_string(uint16_t flags, char *buf, size_t buf_size) {
+    buf[0] = '\0';
+
+    struct { uint16_t mask; const char *name; } table[] = {
+        { 0x0001, "public"     },
+        { 0x0010, "final"      },
+        { 0x0020, "super"      },
+        { 0x0200, "interface"  },
+        { 0x0400, "abstract"   },
+        { 0x1000, "synthetic"  },
+        { 0x2000, "annotation" },
+        { 0x4000, "enum"       },
+        { 0x8000, "module"     },
+    };
+
+    for (size_t i = 0; i < sizeof(table) / sizeof(table[0]); i++) {
+        if (flags & table[i].mask) {
+            if (buf[0] != '\0') {
+                strncat(buf, " ", buf_size - strlen(buf) - 1);
+            }
+            strncat(buf, table[i].name, buf_size - strlen(buf) - 1);
+        }
+    }
+
+    if (buf[0] == '\0') {
+        strncpy(buf, "(none)", buf_size - 1);
+    }
+}
+
 static void skip_fields(const uint8_t *data, uint32_t data_len, uint32_t *offset) {
     uint16_t count = read_u2(data, offset);
     for (uint16_t i = 0; i < count; i++) {
@@ -192,8 +221,13 @@ int main(int argc, char **argv) {
     offset += 4;
     parse_constant_pool(data, data_len, &offset);
 
-    offset += 2 + 2 + 2;
+    uint16_t class_access_flags = read_u2(data, &offset);
+    offset += 4;
     uint16_t iface_count = read_u2(data, &offset);
+    char class_flags_str[128];
+    class_flags_to_string(class_access_flags, class_flags_str, sizeof(class_flags_str));
+    printf("Access Flags: 0x%04X [%s]\n", class_access_flags, class_flags_str);
+
     offset += iface_count * 2;
     skip_fields(data, data_len, &offset);
     skip_methods(data, data_len, &offset);
