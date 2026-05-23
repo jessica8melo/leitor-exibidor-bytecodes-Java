@@ -1,147 +1,89 @@
-#include <stdio.h>
+#include "classfile.h"
+#include "constant_pool.h"
 #include <stdlib.h>
 #include <string.h>
-#include "attributes.h"
+#include <stdio.h>
 
-static uint16_t read_u2(const uint8_t *data, uint32_t data_len, uint32_t *offset)
+u1 read_u1(FILE *fp);
+u2 read_u2(FILE *fp);
+u4 read_u4(FILE *fp);
+
+
+int read_class_attributes(ClassFile *cf, FILE *fp)
 {
-    if (*offset + 2 > data_len) {
-        fprintf(stderr, "[attributes] Erro: leitura fora dos limites (u2 em offset %u)\n", *offset);
-        exit(EXIT_FAILURE);
-    }
+    cf->attributes_count = read_u2(fp);
+    if (cf->attributes_count == 0) { cf->attributes = NULL; return 0; }
 
-    uint16_t value = (uint16_t)((data[*offset] << 8) | data[*offset + 1]);
-    *offset += 2;
-    return value;
-}
+    cf->attributes = calloc(cf->attributes_count, sizeof(attribute_info));
+    if (!cf->attributes) return -1;
 
-static uint32_t read_u4(const uint8_t *data, uint32_t data_len, uint32_t *offset)
-{
-    if (*offset + 4 > data_len) {
-        fprintf(stderr, "[attributes] Erro: leitura fora dos limites (u4 em offset %u)\n", *offset);
-        exit(EXIT_FAILURE);
-    }
-
-    uint32_t value = ((uint32_t)data[*offset] << 24) |
-                     ((uint32_t)data[*offset + 1] << 16) |
-                     ((uint32_t)data[*offset + 2] << 8) |
-                     (uint32_t)data[*offset + 3];
-    *offset += 4;
-    return value;
-}
-
-static ClassAttributeTag resolve_class_attr_tag(const char *name)
-{
-    if (!name) return ATTR_CLASS_UNKNOWN;
-    if (strcmp(name, "SourceFile") == 0) return ATTR_CLASS_SOURCE_FILE;
-    if (strcmp(name, "Signature") == 0) return ATTR_CLASS_SIGNATURE;
-    if (strcmp(name, "Synthetic") == 0) return ATTR_CLASS_SYNTHETIC;
-    if (strcmp(name, "Deprecated") == 0) return ATTR_CLASS_DEPRECATED;
-    if (strcmp(name, "RuntimeVisibleAnnotations") == 0) return ATTR_CLASS_RUNTIME_VISIBLE_ANNOTATIONS;
-    if (strcmp(name, "RuntimeInvisibleAnnotations") == 0) return ATTR_CLASS_RUNTIME_INVISIBLE_ANNOTATIONS;
-    return ATTR_CLASS_UNKNOWN;
-}
-
-static void parse_unknown_attribute(const uint8_t *data, uint32_t *offset, ClassAttributeInfo *attr)
-{
-    attr->info.unknown.length = attr->attribute_length;
-    if (attr->attribute_length > 0) {
-        attr->info.unknown.data = malloc(attr->attribute_length);
-        if (!attr->info.unknown.data) {
-            fprintf(stderr, "[attributes] Erro: sem memória para atributo desconhecido\n");
-            exit(EXIT_FAILURE);
-        }
-        memcpy(attr->info.unknown.data, data + *offset, attr->attribute_length);
-        *offset += attr->attribute_length;
-    } else {
-        attr->info.unknown.data = NULL;
-    }
-}
-
-static void parse_annotations_attribute(const uint8_t *data, uint32_t data_len,
-                                        uint32_t *offset, ClassAttributeInfo *attr)
-{
-    attr->info.annotations.num_annotations = read_u2(data, data_len, offset);
-    uint32_t remaining = attr->attribute_length - 2;
-    attr->info.annotations.raw_length = remaining;
-
-    if (remaining > 0) {
-        attr->info.annotations.raw_bytes = malloc(remaining);
-        if (!attr->info.annotations.raw_bytes) {
-            fprintf(stderr, "[attributes] Erro: sem memória para annotations\n");
-            exit(EXIT_FAILURE);
-        }
-        memcpy(attr->info.annotations.raw_bytes, data + *offset, remaining);
-        *offset += remaining;
-    } else {
-        attr->info.annotations.raw_bytes = NULL;
-    }
-}
-
-static void parse_class_attribute(const uint8_t *data, uint32_t data_len,
-                                  uint32_t *offset, ClassAttributeInfo *attr,
-                                  const ConstantPoolEntry *cp)
-{
-    attr->attribute_name_index = read_u2(data, data_len, offset);
-    attr->attribute_length = read_u4(data, data_len, offset);
-
-    uint32_t end_offset = *offset + attr->attribute_length;
-    const char *attr_name = cp_get_utf8(cp, attr->attribute_name_index);
-    attr->tag = resolve_class_attr_tag(attr_name);
-
-    if (attr->tag == ATTR_CLASS_SOURCE_FILE) {
-        attr->info.source_file.sourcefile_index = read_u2(data, data_len, offset);
-    } else if (attr->tag == ATTR_CLASS_SIGNATURE) {
-        attr->info.signature.signature_index = read_u2(data, data_len, offset);
-    } else if (attr->tag == ATTR_CLASS_RUNTIME_VISIBLE_ANNOTATIONS ||
-               attr->tag == ATTR_CLASS_RUNTIME_INVISIBLE_ANNOTATIONS) {
-        parse_annotations_attribute(data, data_len, offset, attr);
-    } else if (attr->tag == ATTR_CLASS_SYNTHETIC || attr->tag == ATTR_CLASS_DEPRECATED) {
-        /* sem payload */
-    } else {
-        parse_unknown_attribute(data, offset, attr);
-    }
-
-    if (*offset != end_offset) {
-        fprintf(stderr,
-                "[attributes] Aviso: offset inconsistente após atributo '%s' (esperado %u, atual %u)\n",
-                attr_name ? attr_name : "?", end_offset, *offset);
-        *offset = end_offset;
-    }
-}
-
-ClassAttributeInfo *parse_class_attributes(const uint8_t *data, uint32_t data_len,
-                                           uint32_t *offset, uint16_t attributes_count,
-                                           const ConstantPoolEntry *cp)
-{
-    if (attributes_count == 0) return NULL;
-
-    ClassAttributeInfo *attributes = calloc(attributes_count, sizeof(ClassAttributeInfo));
-    if (!attributes) {
-        fprintf(stderr, "[attributes] Erro: sem memória para atributos da classe\n");
-        exit(EXIT_FAILURE);
-    }
-
-    for (uint16_t i = 0; i < attributes_count; i++)
-        parse_class_attribute(data, data_len, offset, &attributes[i], cp);
-
-    return attributes;
-}
-
-void free_class_attributes(ClassAttributeInfo *attributes, uint16_t attributes_count)
-{
-    if (!attributes) return;
-
-    for (uint16_t i = 0; i < attributes_count; i++) {
-        ClassAttributeInfo *attr = &attributes[i];
-
-        if (attr->tag == ATTR_CLASS_RUNTIME_VISIBLE_ANNOTATIONS ||
-            attr->tag == ATTR_CLASS_RUNTIME_INVISIBLE_ANNOTATIONS) {
-            free(attr->info.annotations.raw_bytes);
-        } else if (attr->tag == ATTR_CLASS_UNKNOWN) {
-            free(attr->info.unknown.data);
+    for (u2 i = 0; i < cf->attributes_count; i++) {
+        attribute_info *a = &cf->attributes[i];
+        a->attribute_name_index = read_u2(fp);
+        a->attribute_length     = read_u4(fp);
+        if (a->attribute_length > 0) {
+            a->data = malloc(a->attribute_length);
+            if (!a->data) { fprintf(stderr, "[attributes] sem memória\n"); exit(1); }
+            fread(a->data, 1, a->attribute_length, fp);
+        } else {
+            a->data = NULL;
         }
     }
+    return 0;
+}
 
-    free(attributes);
+
+void free_class_attributes(ClassFile *cf)
+{
+    if (!cf->attributes) return;
+    for (u2 i = 0; i < cf->attributes_count; i++)
+        free(cf->attributes[i].data);
+    free(cf->attributes);
+    cf->attributes = NULL;
+}
+
+void print_class_attributes(ClassFile *cf, FILE *out)
+{
+    fprintf(out, "Class Attributes (count: %d)\n{\n", cf->attributes_count);
+
+    if (cf->attributes_count == 0) {
+        fprintf(out, "\t (no attributes)\n}\n\n");
+        return;
+    }
+
+    for (u2 i = 0; i < cf->attributes_count; i++) {
+        attribute_info *a = &cf->attributes[i];
+        const char *aname = "?";
+        if (a->attribute_name_index < cf->constant_pool_count &&
+            cf->constant_pool[a->attribute_name_index].tag == CONSTANT_Utf8)
+            aname = (char *)cf->constant_pool[a->attribute_name_index].info.utf8_info.bytes;
+
+        fprintf(out, "\t [%d] %s\n", i + 1, aname);
+        fprintf(out, "\t\t Attribute Name: \t\t ConstantPoolInfo #%d <%s>\n",
+                a->attribute_name_index, aname);
+        fprintf(out, "\t\t Attribute Length: \t\t %u\n", a->attribute_length);
+
+        if (strcmp(aname, "SourceFile") == 0 && a->attribute_length == 2) {
+            u2 idx = (u2)((a->data[0] << 8) | a->data[1]);
+            const char *fname = "?";
+            if (idx < cf->constant_pool_count &&
+                cf->constant_pool[idx].tag == CONSTANT_Utf8)
+                fname = (char *)cf->constant_pool[idx].info.utf8_info.bytes;
+            fprintf(out, "\t\t SourceFile: \t\t\t ConstantPoolInfo #%d <%s>\n",
+                    idx, fname);
+        } else if (strcmp(aname, "Signature") == 0 && a->attribute_length == 2) {
+            u2 idx = (u2)((a->data[0] << 8) | a->data[1]);
+            const char *sig = "?";
+            if (idx < cf->constant_pool_count &&
+                cf->constant_pool[idx].tag == CONSTANT_Utf8)
+                sig = (char *)cf->constant_pool[idx].info.utf8_info.bytes;
+            fprintf(out, "\t\t Signature: \t\t\t ConstantPoolInfo #%d <%s>\n",
+                    idx, sig);
+        } else if (a->attribute_length > 0) {
+            fprintf(out, "\t\t (raw bytes, %u bytes)\n", a->attribute_length);
+        }
+
+        if (i + 1 < cf->attributes_count) fprintf(out, "\n");
+    }
+    fprintf(out, "}\n\n");
 }
