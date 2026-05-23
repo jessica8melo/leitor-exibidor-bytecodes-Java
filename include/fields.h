@@ -3,13 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-
-typedef struct {
-    uint8_t  tag;
-    void    *data; 
-} ConstantPoolEntry;
-
-const char *cp_get_utf8(const ConstantPoolEntry *cp, uint16_t index);
+#include "constant_pool.h"
 
 typedef struct {
     uint16_t constantvalue_index;

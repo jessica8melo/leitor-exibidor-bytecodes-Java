@@ -3,13 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-
-typedef struct {
-    uint8_t tag;
-    void *data;
-} ConstantPoolEntry;
-
-const char *cp_get_utf8(const ConstantPoolEntry *cp, uint16_t index);
+#include "constant_pool.h"
 
 typedef struct {
     uint16_t sourcefile_index;
@@ -17,13 +11,13 @@ typedef struct {
 
 typedef struct {
     uint16_t signature_index;
-} Signature_attribute;
+} ClassSignature_attribute;
 
 typedef struct {
     uint16_t  num_annotations;
     uint8_t  *raw_bytes;
     uint32_t  raw_length;
-} Annotations_attribute;
+} ClassAnnotations_attribute;
 
 typedef enum {
     ATTR_CLASS_SOURCE_FILE = 0,
@@ -41,8 +35,8 @@ typedef struct {
     ClassAttributeTag tag;
     union {
         SourceFile_attribute   source_file;
-        Signature_attribute    signature;
-        Annotations_attribute  annotations;
+        ClassSignature_attribute    signature;
+        ClassAnnotations_attribute  annotations;
         struct {
             uint8_t *data;
             uint32_t length;
