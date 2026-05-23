@@ -1,4 +1,5 @@
 #include "constant_pool.h"
+#include "cp_resolver.h"
 #include <stdlib.h>
 #include <string.h>
 

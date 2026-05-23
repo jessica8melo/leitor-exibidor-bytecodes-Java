@@ -1,5 +1,6 @@
 #include "printer.h"
 #include "classfile.h"
+#include "cp_resolver.h"
 #include <math.h>
 #include <string.h>
 
