@@ -1,1 +1,4 @@
-// structs e funções de methods
+#ifndef METHODS_H
+#define METHODS_H
+
+#endif

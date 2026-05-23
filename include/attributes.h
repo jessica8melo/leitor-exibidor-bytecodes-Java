@@ -1,1 +1,4 @@
-// structs de atributos gerais
+#ifndef ATTRIBUTES_H
+#define ATTRIBUTES_H
+
+#endif

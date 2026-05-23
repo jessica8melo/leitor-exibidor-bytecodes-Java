@@ -1,1 +1,4 @@
-// decodificação de instruções
+#ifndef BYTECODE_H
+#define BYTECODE_H
+
+#endif
