@@ -43,13 +43,13 @@ int main(int argc, char *argv[]) {
                 out = stdout;
             }
         }
-        
+
         print_class_file(cf, out);
-        
+
         if (out != stdout) {
             fclose(out);
         }
-        
+
         free_class_file(cf);
     }
 

@@ -6,4 +6,4 @@
 
 void print_class_file(ClassFile *cf, FILE *out);
 
-#endif
+#endif /* PRINTER_H */
