@@ -1,6 +1,7 @@
 #include "classfile.h"
 #include "constant_pool.h"
 #include "cp_resolver.h"
+#include "bytecode.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -102,12 +103,18 @@ static void print_code_attribute(ClassFile *cf, attribute_info *attr, FILE *out)
     fprintf(out, "\t\t\t Max Locals: \t\t\t %d\n", max_locals);
     fprintf(out, "\t\t\t Code Length: \t\t\t %u\n", code_len);
 
-    fprintf(out, "\t\t\t Bytecodes (hex):\n\t\t\t\t ");
-    for (u4 b = 0; b < code_len; b++) {
-        fprintf(out, "%02X ", code[b]);
-        if ((b + 1) % 16 == 0 && b + 1 < code_len)
-            fprintf(out, "\n\t\t\t\t ");
-    }
+    fprintf(
+    out,
+    "\t\t\t Bytecodes:\n"
+    );
+
+    print_bytecodes(
+    cf,
+    code,
+    code_len,
+    out
+    );
+
     fprintf(out, "\n");
 
     u4 pos = 8 + code_len;

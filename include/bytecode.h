@@ -14,10 +14,10 @@ typedef struct{
 extern Opcode opcodeTable[256];
 
 void print_bytecodes(
-        ClassFile *cf,
-        u1 *code,
-        u4 code_length,
-        FILE *out
+    ClassFile *cf,
+    u1 *code,
+    u4 code_length,
+    FILE *out
 );
 
 #endif

@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Iinclude -g
 LDFLAGS = -lm
 
-SRC = src/main.c src/references.c src/constant_pool.c src/printer.c src/cp_resolver.c
+SRC = src/main.c src/references.c src/constant_pool.c src/printer.c src/cp_resolver.c src/bytecodes.c src/methods.c src/attributes.c src/fields.c
 OBJ = $(SRC:.c=.o)
 EXEC = bin
 
