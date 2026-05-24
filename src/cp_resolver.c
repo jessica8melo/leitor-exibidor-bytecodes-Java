@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "../include/cp_resolver.h"
 
@@ -282,7 +283,7 @@ u2 index
 
             sprintf(
             buffer,
-            "%lld",
+            "%" PRId64,
             value
             );
 
