@@ -87,7 +87,6 @@ u2 index
         }
 
 
-
         case CONSTANT_NameAndType:{
 
             char *name=
@@ -238,6 +237,52 @@ u2 index
             sprintf(
             buffer,
             "%lf",
+            value
+            );
+
+            break;
+        }
+
+
+
+        case CONSTANT_Float:{
+
+            uint32_t bits=
+            cp->info.float_info.bytes;
+
+            float value;
+
+            memcpy(
+            &value,
+            &bits,
+            sizeof(float)
+            );
+
+            sprintf(
+            buffer,
+            "%f",
+            value
+            );
+
+            break;
+        }
+
+
+
+        case CONSTANT_Long:{
+
+            int64_t value=
+            (
+            ((int64_t)
+            cp->info.long_info.high_bytes)
+            <<32
+            )
+            |
+            cp->info.long_info.low_bytes;
+
+            sprintf(
+            buffer,
+            "%lld",
             value
             );
 
