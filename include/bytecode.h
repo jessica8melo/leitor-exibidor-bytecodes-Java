@@ -2,14 +2,13 @@
 #define BYTECODE_H
 
 #include "classfile.h"
-#include <stdio.h>
 
 typedef struct{
 
     char *mnemonic;
     int operands;
 
-}Opcode;
+} Opcode;
 
 extern Opcode opcodeTable[256];
 
