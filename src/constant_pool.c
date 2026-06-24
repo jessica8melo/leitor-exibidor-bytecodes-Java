@@ -1,9 +1,7 @@
 #include "constant_pool.h"
-#include "cp_resolver.h"
 #include <stdlib.h>
 #include <string.h>
 
-// Helper reading declarations from references.c
 u1 read_u1(FILE *fp);
 u2 read_u2(FILE *fp);
 u4 read_u4(FILE *fp);
@@ -46,7 +44,7 @@ int read_constant_pool(ClassFile *cf, FILE *fp) {
                 cf->constant_pool[i].info.long_info.low_bytes = read_u4(fp);
                 i++;
                 if(i < cf->constant_pool_count) {
-                     cf->constant_pool[i].tag = 0; // null tag for second part of Long/Double
+                     cf->constant_pool[i].tag = 0; 
                 }
                 break;
             case CONSTANT_Double:
@@ -54,7 +52,7 @@ int read_constant_pool(ClassFile *cf, FILE *fp) {
                 cf->constant_pool[i].info.double_info.low_bytes = read_u4(fp);
                 i++;
                 if(i < cf->constant_pool_count) {
-                     cf->constant_pool[i].tag = 0; // null tag for second part of Long/Double
+                     cf->constant_pool[i].tag = 0; 
                 }
                 break;
             case CONSTANT_NameAndType:

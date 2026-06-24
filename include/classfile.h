@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef uint8_t  u1;
+typedef uint8_t u1;
 typedef uint16_t u2;
 typedef uint32_t u4;
 
@@ -20,82 +20,83 @@ typedef uint32_t u4;
 #define CONSTANT_InterfaceMethodref 11
 #define CONSTANT_NameAndType        12
 
-typedef struct { u2 name_index; }                               ConstClass_info;
-typedef struct { u2 class_index; u2 name_and_type_index; }     ConstFieldref_info;
-typedef struct { u2 class_index; u2 name_and_type_index; }     ConstMethodref_info;
-typedef struct { u2 class_index; u2 name_and_type_index; }     ConstInterfaceMethodref_info;
-typedef struct { u2 string_index; }                             ConstString_info;
-typedef struct { u4 bytes; }                                    ConstInteger_info;
-typedef struct { u4 bytes; }                                    ConstFloat_info;
-typedef struct { u4 high_bytes; u4 low_bytes; }                 ConstLong_info;
-typedef struct { u4 high_bytes; u4 low_bytes; }                 ConstDouble_info;
-typedef struct { u2 name_index; u2 descriptor_index; }         ConstNameAndType_info;
-typedef struct { u2 length; u1 *bytes; }                       ConstUtf8_info;
+typedef struct {
+    u2 name_index;
+} ConstClass_info;
+
+typedef struct {
+    u2 class_index;
+    u2 name_and_type_index;
+} ConstFieldref_info;
+
+typedef struct {
+    u2 class_index;
+    u2 name_and_type_index;
+} ConstMethodref_info;
+
+typedef struct {
+    u2 class_index;
+    u2 name_and_type_index;
+} ConstInterfaceMethodref_info;
+
+typedef struct {
+    u2 string_index;
+} ConstString_info;
+
+typedef struct {
+    u4 bytes;
+} ConstInteger_info;
+
+typedef struct {
+    u4 bytes;
+} ConstFloat_info;
+
+typedef struct {
+    u4 high_bytes;
+    u4 low_bytes;
+} ConstLong_info;
+
+typedef struct {
+    u4 high_bytes;
+    u4 low_bytes;
+} ConstDouble_info;
+
+typedef struct {
+    u2 name_index;
+    u2 descriptor_index;
+} ConstNameAndType_info;
+
+typedef struct {
+    u2 length;
+    u1 *bytes;
+} ConstUtf8_info;
 
 typedef struct {
     u1 tag;
     union {
-        ConstClass_info              class_info;
-        ConstFieldref_info           fieldref_info;
-        ConstMethodref_info          methodref_info;
+        ConstClass_info class_info;
+        ConstFieldref_info fieldref_info;
+        ConstMethodref_info methodref_info;
         ConstInterfaceMethodref_info interface_methodref_info;
-        ConstString_info             string_info;
-        ConstInteger_info            integer_info;
-        ConstFloat_info              float_info;
-        ConstLong_info               long_info;
-        ConstDouble_info             double_info;
-        ConstNameAndType_info        name_and_type_info;
-        ConstUtf8_info               utf8_info;
+        ConstString_info string_info;
+        ConstInteger_info integer_info;
+        ConstFloat_info float_info;
+        ConstLong_info long_info;
+        ConstDouble_info double_info;
+        ConstNameAndType_info name_and_type_info;
+        ConstUtf8_info utf8_info;
     } info;
 } cp_info;
 
 typedef struct {
-    u2  attribute_name_index;
-    u4  attribute_length;
-    u1 *data;   /* bytes brutos do atributo */
-} attribute_info;
-
-typedef struct {
-    u2              access_flags;
-    u2              name_index;
-    u2              descriptor_index;
-    u2              attributes_count;
-    attribute_info *attributes;
-} field_info;
-
-typedef struct {
-    u2              access_flags;
-    u2              name_index;
-    u2              descriptor_index;
-    u2              attributes_count;
-    attribute_info *attributes;
-} method_info;
-
-typedef struct {
-    u4          magic;
-    u2          minor_version;
-    u2          major_version;
-    u2          constant_pool_count;
-    cp_info    *constant_pool;
-
-    u2          access_flags;
-    u2          this_class;
-    u2          super_class;
-
-    u2          interfaces_count;
-    u2         *interfaces;
-
-    u2          fields_count;
-    field_info *fields;
-
-    u2           methods_count;
-    method_info *methods;
-
-    u2              attributes_count;
-    attribute_info *attributes;
+    u4 magic;
+    u2 minor_version;
+    u2 major_version;
+    u2 constant_pool_count;
+    cp_info *constant_pool;
 } ClassFile;
 
-ClassFile *read_class_file(FILE *fp);
-void       free_class_file(ClassFile *cf);
+ClassFile* read_class_file(FILE *fp);
+void free_class_file(ClassFile *cf);
 
-#endif /* CLASSFILE_H */
+#endif
