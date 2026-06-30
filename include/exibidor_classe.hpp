@@ -7,19 +7,84 @@
 #include <cstdio>
 #include <string>
 
+/**
+ * @file exibidor_classe.hpp
+ * @brief Declaração do disassembler textual e exibidor de arquivos .class (Modo -r).
+ */
+
+/**
+ * @brief Escreve o relatório formatado completo do arquivo de classe no arquivo ou fluxo de saída.
+ * @param arq Ponteiro para a estrutura ArquivoClasse já carregada na memória.
+ * @param saida Ponteiro FILE para o fluxo de saída (pode ser stdout ou arquivo aberto em modo escrita).
+ */
 void escrever_arquivo(ArquivoClasse* arq, FILE* saida);
 
+/**
+ * @brief Imprime as informações gerais da classe (versão, assinatura mágica, flags e índices).
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_info_geral(ArquivoClasse* arq);
+
+/**
+ * @brief Imprime todas as entradas do Pool de Constantes decodificadas e numeradas.
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_pool_constantes(ArquivoClasse* arq);
+
+/**
+ * @brief Imprime a lista de interfaces implementadas pela classe.
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_interfaces(ArquivoClasse* arq);
+
+/**
+ * @brief Imprime os campos (fields) da classe, seus tipos, descritores e atributos.
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_campos(ArquivoClasse* arq);
+
+/**
+ * @brief Imprime os métodos da classe, incluindo seus descritores, flags e bytecodes.
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_metodos(ArquivoClasse* arq);
+
+/**
+ * @brief Imprime os atributos de nível de classe (ex: SourceFile, InnerClasses).
+ * @param arq Ponteiro para o ArquivoClasse.
+ */
 void escrever_atributos(ArquivoClasse* arq);
 
+/**
+ * @brief Imprime os detalhes de um atributo específico com indentação controlada.
+ * @param a Estrutura AttributeInfo contendo o atributo a ser exibido.
+ * @param idx Índice do atributo na lista do elemento pai.
+ * @param pool Ponteiro para o Pool de Constantes da classe.
+ * @param nivel Nível de indentação para formatação na saída textual.
+ */
 void escrever_atributo(AttributeInfo a, uint32_t idx, ConstantPoolInfo* pool, uint8_t nivel);
+
+/**
+ * @brief Disassebla e imprime o fluxo de instruções (bytecodes) do atributo Code de um método.
+ * @param c Estrutura CodeAttribute contendo o vetor de bytes e tabelas de exceção.
+ * @param pool Ponteiro para o Pool de Constantes.
+ * @param nivel Nível de indentação na saída textual.
+ */
 void escrever_bytecode(CodeAttribute c, ConstantPoolInfo* pool, uint8_t nivel);
 
+/**
+ * @brief Retorna uma representação textual das flags de acesso combinadas.
+ * @param access_flags Máscara de bits contendo as flags (public, static, final, etc.).
+ * @return const char* String formatada listando as flags ativas.
+ */
 const char* flags_acesso_str(u2 access_flags);
+
+/**
+ * @brief Formata uma entrada do Pool de Constantes como string humanamente legível.
+ * @param pool Ponteiro para o vetor do Pool de Constantes.
+ * @param index Índice (1-indexed) da constante no pool.
+ * @return const char* String resolvida contendo o nome ou valor da constante.
+ */
 const char* formatar_constante(ConstantPoolInfo* pool, u2 index);
 
 static const std::string tabela_mnemonicos[] = {

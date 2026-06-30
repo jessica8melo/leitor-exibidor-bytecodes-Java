@@ -8,15 +8,33 @@
 #include <stack>
 #include <string>
 
-class Arranjo;
+/**
+ * @file executor.hpp
+ * @brief Declaração do motor de execução da JVM (Modo -e) e tabela de despacho de opcodes.
+ */
 
+class Arranjo;
 class Executor;
 
+/**
+ * @brief Tipo de ponteiro para membro de função da classe Executor (handler de opcode).
+ */
 typedef void (Executor::*funcao_generica)();
 
+/**
+ * @class Executor
+ * @brief Singleton responsável por executar o ciclo principal de interpretação de bytecodes.
+ *
+ * Mantém a tabela de despacho com 202 ponteiros de função (`tabela_funcoes`), gerencia a pilha
+ * de frames da JVM (`PilhaExecucao`), executa métodos (<clinit>, main e chamadas subsequentes)
+ * e implementa o comportamento semântico de cada instrução Java.
+ */
 class Executor {
 public:
-
+    /**
+     * @brief Obtém a instância única do Singleton Executor.
+     * @return Executor& Referência para o motor de execução.
+     */
     static Executor& instancia()
     {
         static Executor unico;
@@ -25,11 +43,34 @@ public:
 
     ~Executor();
 
+    /**
+     * @brief Inicia a execução do programa Java a partir de uma classe carregada.
+     *
+     * Cria o frame inicial do método main([Ljava/lang/String;)V, empilha o frame do bloco
+     * estático <clinit> se existir, e entra no laço iterativo de despacho de opcodes
+     * enquanto houver frames ativos na Pilha de Execução.
+     *
+     * @param classe_runtime Ponteiro para a classe principal instanciada na Área de Métodos.
+     */
     void executar_metodos(ClasseEstatica* classe_runtime);
 
+    /**
+     * @brief Verifica se um método específico (nome e descritor) existe na classe em tempo de execução.
+     * @param classe_runtime Ponteiro para a classe em inspeção.
+     * @param nome Nome do método (ex: "<clinit>" ou "main").
+     * @param descritor Assinatura de tipo do método (ex: "()V").
+     * @return true Se o método for encontrado na tabela de métodos do ArquivoClasse.
+     * @return false Caso contrário.
+     */
     bool verifica_metodo(ClasseEstatica* classe_runtime,
                          const std::string& nome, const std::string& descritor);
 
+    /**
+     * @brief Cria e preenche recursivamente um arranjo multidimensional na memória Heap.
+     * @param arranjo Ponteiro para o arranjo atual sendo populado.
+     * @param tipo_valor Tipo primitivo final ou de referência dos elementos da última dimensão.
+     * @param contagem Pilha contendo as dimensões (tamanho de cada nível do multiarray).
+     */
     void popula_multiarranjo(Arranjo* arranjo, TipoValor tipo_valor,
                              std::stack<int> contagem);
 

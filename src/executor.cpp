@@ -31,6 +31,18 @@ Executor::~Executor()
 {
 }
 
+/**
+ * @brief Laço principal de despacho (Execution Engine Loop) da Máquina Virtual Java.
+ *
+ * Configura o ambiente inicial de invocação da JVM:
+ * 1. Empilha o frame do método main([Ljava/lang/String;)V passando o array de argumentos.
+ * 2. Inspeciona a classe para identificar se há inicializador estático (<clinit>). Se houver,
+ *    empilha seu frame no topo para que seja executado antes do main.
+ * 3. Inicia o laço de despacho iterativo: obtém o frame do topo, decodifica o opcode apontado
+ *    pelo registrador PC e executa o método correspondente via tabela_funcoes[opcode].
+ *
+ * @param classe_runtime Ponteiro para a representação em memória da classe de entrada.
+ */
 void Executor::executar_metodos(ClasseEstatica* classe_runtime)
 {
     PilhaExecucao& pilha = PilhaExecucao::instancia();

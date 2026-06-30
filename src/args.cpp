@@ -3,6 +3,17 @@
 
 using namespace std;
 
+/**
+ * @brief Extrai o valor associado a uma flag específica nos argumentos de linha de comando.
+ *
+ * Realiza a comparação de prefixo na string do argumento para identificar flags passadas
+ * no formato "-r=", "-o=" ou "-e=" e retorna o ponteiro para o início do valor após o sinal de igual.
+ *
+ * @param arg Argumento bruto sendo inspecionado.
+ * @param flag Prefixo esperado da flag (ex: "-r=").
+ * @param flag_len Comprimento do prefixo da flag.
+ * @return const char* Ponteiro para a substring do valor, ou nullptr se a flag não coincidir.
+ */
 static const char* extrair_valor(const char* arg, const char* flag, size_t flag_len)
 {
     if (strncmp(arg, flag, flag_len) == 0) {

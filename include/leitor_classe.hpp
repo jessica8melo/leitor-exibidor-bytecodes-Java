@@ -5,14 +5,36 @@
 #include "arquivo_classe.hpp"
 #include <cstdio>
 
+/**
+ * @file leitor_classe.hpp
+ * @brief Declaração do leitor de arquivos binários .class (parser de bytecode Java).
+ */
+
+/**
+ * @class LeitorClasse
+ * @brief Classe Singleton responsável por decodificar arquivos binários .class na estrutura ArquivoClasse.
+ *
+ * Realiza a verificação de assinatura mágica, versões, leitura do pool de constantes e
+ * decodificação de todas as tabelas de classes (campos, métodos e atributos), tratando a
+ * conversão de endianness de Big-Endian para Little-Endian.
+ */
 class LeitorClasse {
 public:
+    /**
+     * @brief Obtém a instância única do Singleton LeitorClasse.
+     * @return LeitorClasse& Referência para a instância do leitor.
+     */
     static LeitorClasse& instancia()
     {
         static LeitorClasse unico;
         return unico;
     }
 
+    /**
+     * @brief Lê e decodifica um arquivo .class aberto a partir do ponteiro FILE.
+     * @param fp Ponteiro para o arquivo .class aberto em modo binário de leitura ("rb").
+     * @return ArquivoClasse* Ponteiro para a estrutura ArquivoClasse alocada e preenchida.
+     */
     ArquivoClasse* ler_arquivo(FILE* fp);
 
     LeitorClasse(const LeitorClasse&)            = delete;

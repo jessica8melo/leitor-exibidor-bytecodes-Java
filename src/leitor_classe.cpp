@@ -16,6 +16,19 @@ bool LeitorClasse::host_little_endian()
     return *reinterpret_cast<char*>(&n) == 1;
 }
 
+/**
+ * @brief Decodifica a estrutura completa do arquivo .class na memória.
+ *
+ * Executa a leitura sequencial em passos:
+ * 1. Validação da assinatura mágica (0xCAFEBABE).
+ * 2. Leitura e verificação de compatibilidade da versão (máximo Java SE 8 / major 52).
+ * 3. Alocação e decodificação das entradas do Pool de Constantes.
+ * 4. Leitura de flags de acesso, classe atual, super classe e interfaces.
+ * 5. Leitura e decodificação das tabelas de campos, métodos e atributos da classe.
+ *
+ * @param fp Ponteiro do arquivo de onde os bytes serão lidos.
+ * @return ArquivoClasse* Ponteiro para a estrutura ArquivoClasse construída.
+ */
 ArquivoClasse* LeitorClasse::ler_arquivo(FILE* fp)
 {
     ArquivoClasse* arq = new ArquivoClasse();

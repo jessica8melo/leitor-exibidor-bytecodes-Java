@@ -1,0 +1,12 @@
+PROJECT_NAME           = "JVM C++ (Leitor/Exibidor e Motor de Execução)"
+PROJECT_BRIEF          = "Implementação de uma Máquina Virtual Java em C++14"
+OUTPUT_DIRECTORY       = doc
+INPUT                  = include src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.cpp
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+OPTIMIZE_OUTPUT_FOR_C  = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+QUIET                  = YES
