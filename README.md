@@ -69,3 +69,22 @@ Interpreta os bytecodes e imprime a saída do programa no terminal. Exemplos:
   `Object` são tratados nativamente; classes como `StringBuffer` não são
   suportadas.
 - `invokedynamic` não é implementado (requer *bootstrap methods*).
+
+## Como gerar a documentação no Windows (Versão Browser / HTML)
+
+O projeto está totalmente configurado no padrão **Doxygen** (`Doxyfile` incluso na raiz). Para gerar e navegar na documentação visual no seu navegador no Windows:
+
+1. **Instale o Doxygen**:
+   - Baixe o instalador oficial para Windows no site [doxygen.nl/download.html](https://www.doxygen.nl/download.html) ou instale via terminal via winget/choco:
+     ```powershell
+     winget install Doxygen.Doxygen
+     ```
+2. **Gere a documentação**:
+   - Abra o terminal (PowerShell ou CMD) na pasta raiz do projeto e execute:
+     ```powershell
+     doxygen Doxyfile
+     ```
+3. **Abra no Navegador**:
+   - Uma nova pasta chamada `doc` será criada.
+   - Navegue até a pasta `doc/html` e dê um duplo clique no arquivo **`index.html`** para abrir a documentação interativa no seu navegador web padrão.
+
